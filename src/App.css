@@ -1,0 +1,48 @@
+.App {
+  text-align: center;
+}
+
+html {
+  font-family: 'Inter-Medium', sans-serif;
+  line-height: 18px;
+}
+body {
+  font-family: 'Inter-Medium', sans-serif;
+  background: #f2f4f8;
+  color: #363c4e;
+  height: 100vh;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 18px;
+}
+
+#graph {
+  position: relative;
+}
+.display {
+  background-color: #fff;
+  position: relative;
+}
+
+#tooltip {
+  position: absolute;
+  display: block;
+  width: 200px;
+  height: 120px;
+  background: #fff;
+  box-shadow: 2px 10px 30px rgba(0, 0, 0, 0.22);
+  border-radius: 10px;
+  z-index: 1000;
+  overflow: hidden;
+}
+.horizontalGrid {
+  stroke: lightgrey;
+}
+#tooltip-head {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  background-color: #e0e3e6;
+  font-size: 16px;
+}
