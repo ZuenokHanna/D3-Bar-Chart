@@ -35,6 +35,7 @@ body {
   border-radius: 10px;
   z-index: 1000;
   overflow: hidden;
+  white-space: pre-line;
 }
 .horizontalGrid {
   stroke: lightgrey;
@@ -45,4 +46,5 @@ body {
   padding: 10px 0;
   background-color: #e0e3e6;
   font-size: 16px;
+  margin-bottom: 20px;
 }

@@ -12,7 +12,7 @@ const BarChart = ({ data }) => {
   const draw = () => {
     const totalHeight = 550
     const totalWidth = 925
-    const margin = { top: 20, right: 30, bottom: 40, left: 60 }
+    const margin = { top: 20, right: 60, bottom: 40, left: 60 }
     const width = totalWidth - margin.left - margin.right
     const height = totalHeight - margin.top - margin.bottom
 
@@ -24,6 +24,12 @@ const BarChart = ({ data }) => {
     const xScale = d3.scaleTime().domain([minDate, maxDate]).range([0, width])
 
     const yScale = d3
+      .scaleLinear()
+      // @ts-ignore
+      .domain([0, d3.max(data, (d) => d[1])])
+      .range([height, 0])
+
+    const yRightScale = d3
       .scaleLinear()
       // @ts-ignore
       .domain([0, d3.max(data, (d) => d[1])])
@@ -41,6 +47,8 @@ const BarChart = ({ data }) => {
       .ticks(4)
       .tickFormat((d: any) => `$${d.toFixed(0)}`)
 
+    const yRightAxis = d3.axisRight(yRightScale).ticks(10)
+
     const display = d3
       .select('.display')
       .attr('width', totalWidth)
@@ -53,6 +61,7 @@ const BarChart = ({ data }) => {
 
       const text = tooltip.append('text')
       text.append('tspan').attr('id', 'tooltip-head')
+      text.append('tspan').attr('id', 'tooltip-body')
 
       return tooltip
     }
@@ -62,7 +71,7 @@ const BarChart = ({ data }) => {
     // Adds horizontal grid
     display
       .selectAll('.horizontalGrid')
-      .data(yScale.ticks(3))
+      .data(yScale.ticks(9))
       .enter()
       .append('line')
       .attr('class', 'horizontalGrid')
@@ -88,6 +97,29 @@ const BarChart = ({ data }) => {
       .attr('x', (d: any, i) => barWidth * i)
       .attr('y', (d: any, i) => yScale(d[1]))
       .attr('stroke', '#fff')
+      .on('mouseover', (d: any, i: any) => {
+        tooltip.style('display', null)
+        d3.select(d.target).style('fill', '#f7be0f')
+      })
+      .on('mouseout', (d: any, i: any) => {
+        tooltip.style('display', 'none')
+        d3.select(d.target).style('fill', '#f7be0f')
+      })
+      .on('mousemove', (d: any, i: any) => {
+        const left = d.clientX - 230 + 'px'
+        const top = d.clientY - 70 + 'px'
+        const options = { weekday: 'short' }
+        // @ts-ignore
+        const day = new Intl.DateTimeFormat('en-US', options).format(new Date(i[0]))
+        const dataHeader = `${day}-${new Date(i[0]).toLocaleDateString('en-US', {
+          dateStyle: 'long',
+        })}`
+        const dataInfo = `price: ${i[1]}$ \n count: ${i[2]}`
+        d3.select('#tooltip-head').text(dataHeader)
+        d3.select('#tooltip-body').text(dataInfo)
+        tooltip.style('top', top).style('left', left).style('display', 'block')
+        d3.select(d.target).style('fill', '#e6a810')
+      })
 
     const line = d3
       .line()
@@ -102,7 +134,7 @@ const BarChart = ({ data }) => {
       .attr('stroke', '#b270d2')
       .attr('stroke-linejoin', 'round')
       .attr('stroke-linecap', 'round')
-      .attr('stroke-width', 3)
+      .attr('stroke-width', 2)
       .attr('d', line)
 
     // Add the line circles
@@ -128,13 +160,15 @@ const BarChart = ({ data }) => {
       .on('mousemove', (d: any, i: any) => {
         const left = d.clientX - 230 + 'px'
         const top = yScale(i[2]) - 50 + 'px'
-        let options = { weekday: 'short' }
+        const options = { weekday: 'short' }
         // @ts-ignore
         const day = new Intl.DateTimeFormat('en-US', options).format(new Date(i[0]))
         const dataHeader = `${day}-${new Date(i[0]).toLocaleDateString('en-US', {
           dateStyle: 'long',
         })}`
+        const dataInfo = `price: ${i[1]}$ \n count: ${i[2]}`
         d3.select('#tooltip-head').text(dataHeader)
+        d3.select('#tooltip-body').text(dataInfo)
         tooltip.style('top', top).style('left', left)
         d3.select(d.target).style('stroke', '#d589f9').style('stroke-width', 4).attr('r', 8)
       })
@@ -146,6 +180,12 @@ const BarChart = ({ data }) => {
       .call(xAxis)
 
     display.append('g').attr('id', 'y-axis').call(yAxis)
+
+    display
+      .append('g')
+      .attr('id', 'y-right-axis')
+      .call(yRightAxis)
+      .attr('transform', 'translate( ' + width + ', 0 )')
   }
 
   return (
